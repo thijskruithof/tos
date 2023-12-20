@@ -12,7 +12,7 @@ mov bp, 0x9000
 mov sp, bp
 
 call load_kernel
-; call switch_to_32bit
+call switch_to_32bit
 
 ; infinite loop
 jmp $       

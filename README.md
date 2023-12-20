@@ -7,3 +7,4 @@ Requirements:
 - Make
 - Nasm
 - GCC
+- Qemu

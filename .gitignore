@@ -3,3 +3,4 @@
 *.tmp
 mbr.bin
 kernel.bin 
+*.map
