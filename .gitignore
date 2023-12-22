@@ -4,3 +4,5 @@
 mbr.bin
 kernel.bin 
 *.map
+*.disasm
+*.lst
