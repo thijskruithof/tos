@@ -20,17 +20,10 @@ mov gs, ax
 ; (i.e. the stack base will be located at 0:0x7c00).        
 mov sp, bootstage0_entry   
 ; Clear direction flag (go forward in memory when using instructions like lodsb).
-cld    
+cld                                 
 
-; Storing disk number. BIOS loads into dl the "drive number" of the booted device.
-mov [disk_currentdisk], dl                                  
-
-; Loading stage 1 from disk into RAM
-mov ax, (bootstage1_start-bootstage0_start)/512 ; ax: start sector
-mov cx, (kernel_end-bootstage1_start)/512       ; cx: number of sectors (512 bytes) to read
-mov bx, bootstage1_start                        ; bx: offset of dest buffer
-xor dx, dx                                      ; dx: segment of dest buffer
-call Real_mode_read_disk
+; Loading stage 1 from disk into RAM (places it at 'bootstage1_start')
+call disk_read_bootstage1
 
 ; Print "MBR stage finished." message.
 mov si, mbr_message

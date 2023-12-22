@@ -17,4 +17,3 @@ kernel_start:
 align 512, db 0
 kernel_end:
 
-

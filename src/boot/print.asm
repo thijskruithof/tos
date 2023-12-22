@@ -8,6 +8,10 @@ db 13,10 ; \r\n
 mbr_message dw 18
 db 'TOS: MBR finished.'
 
+printnr_buf dw 3
+db 0, 0
+db 'h'
+
 ;---Code------------------------------------------------------------------------
 
 Real_mode_print:
@@ -45,3 +49,22 @@ mov si, newline
 call Real_mode_print
 pop si
 ret
+
+Real_mode_printnr:
+;***********************************************************;
+; Prints value from AL                                      ;
+;***********************************************************;
+push ax
+and al, 0xF0
+shr al, 4
+add al, '0'
+mov [printnr_buf+2], al
+pop ax
+and al, 0x0F
+add al, '0'
+mov [printnr_buf+3], al
+mov si, printnr_buf
+call Real_mode_print
+mov si, newline
+call Real_mode_print
+ret 

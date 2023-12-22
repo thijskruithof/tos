@@ -17,8 +17,8 @@ all: bin\tos.bin
 # bin\kernel.o: src\kernel.c
 # 	gcc -m64 -nostdinc -nostdlib -ffreestanding -mcmodel=large -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -c $< -o $@
 
-bin\tos.bin: src\tos.asm
-	nasm -isrc\ $^ -f bin -o $@ -l bin\tos.lst
+bin\tos.bin: src\tos.asm src\boot\bootstage0.asm src\boot\bootstage1.asm src\boot\disk.asm src\boot\print.asm
+	nasm -isrc\ src\tos.asm -f bin -o $@ -l bin\tos.lst
 	ndisasm -b 16 $@ > bin\tos.disasm
 
 # bin\tos.bin: bin\mbr.bin #bin\kernel.bin
@@ -26,6 +26,7 @@ bin\tos.bin: src\tos.asm
 # copy /b bin\mbr.bin $@
 
 run: bin\tos.bin
+# -s -S is for "wait for gdb debugger to attach on tcp port 1234"
 	qemu-system-i386 -fda $< 
 
 clean:
