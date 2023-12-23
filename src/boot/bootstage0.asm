@@ -9,6 +9,9 @@ jmp 0x0000:.setup_segments
 
 .setup_segments:
 
+; Magic breakpoint for Bochs (to start debugging from here)
+xchg bx, bx
+
 ; Next, we set all segment registers to zero.
 xor ax, ax
 mov ss, ax

@@ -26,8 +26,9 @@ bin\tos.bin: src\tos.asm src\boot\bootstage0.asm src\boot\bootstage1.asm src\boo
 # copy /b bin\mbr.bin $@
 
 run: bin\tos.bin
-# -s -S is for "wait for gdb debugger to attach on tcp port 1234"
-	qemu-system-i386 -fda $< 
+#	qemu-system-i386 -fda $< 
+	bochsdbg -f bin\bochsrc.bxrc -q
+
 
 clean:
 	$(RM) bin\*.bin bin\*.o bin\*.dis
