@@ -32,6 +32,12 @@ call disk_read_bootstage1
 mov si, mbr_message
 call Real_mode_println
 
+; Magic breakpoint for Bochs (to start debugging from here)
+xchg bx, bx
+
+; Jump to the entry point of stage 1 
+jmp bootstage1_entry
+
 .halt: hlt   ; Infinite loop.
 jmp .halt    ; (It prevents us from going off in memory and executing junk).
 

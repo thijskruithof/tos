@@ -17,7 +17,7 @@ disk_read_bootstage1:
 mov ah, 0x02  ; "Read sectors from drive"
 mov al, 1 + ((kernel_end-bootstage1_start)/512) ; number of sectors to read
 mov ch, 0                   ; Starting cylinder
-mov cl, 1                   ; Starting sector (1-based)
+mov cl, 2                   ; Starting sector (1-based)
 mov dh, 0                   ; Starting head
 mov bx, bootstage1_start    ; Destination buffer
 int 0x13

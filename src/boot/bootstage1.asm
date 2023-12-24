@@ -10,6 +10,7 @@ db 'Long mode is not supported.'
 
 ;---Code------------------------------------------------------------------------
 bootstage1_entry:
+
 ; Print 'Entering Stage 2...' message
 mov si, bootstage1_message
 call Real_mode_println
