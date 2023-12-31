@@ -1,0 +1,4 @@
+[submodule "gnu-efi"]
+	path = gnu-efi
+	url = https://github.com/pbatard/gnu-efi.git
+	ignore = dirty
