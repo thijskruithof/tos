@@ -4,7 +4,7 @@
 
 GCC := x86_64-w64-mingw32-gcc
 
-all: bin\BOOTX64.EFI
+all: bin\EFI\BOOT\BOOTX64.EFI
 
 bin\main.o: src\main.c 
 	$(GCC) -ffreestanding -Iexternal/gnu-efi/inc -Iexternal/gnu-efi/inc/x86_64 -Iexternal/gnu-efi/inc/protocol -c -o $@ $<
@@ -12,7 +12,7 @@ bin\main.o: src\main.c
 bin\libgnuefi_data.o: src\libgnuefi_data.c 
 	$(GCC) -ffreestanding -Iexternal/gnu-efi/inc -Iexternal/gnu-efi/inc/x86_64 -Iexternal/gnu-efi/inc/protocol -c -o $@ $<
 
-bin\BOOTX64.EFI: bin\main.o bin\libgnuefi_data.o 
+bin\EFI\BOOT\BOOTX64.EFI: bin\main.o bin\libgnuefi_data.o 
 	$(GCC) -nostdlib -Wl,-dll -shared -Wl,--subsystem,10 -e efi_main -o $@ $^
 
 # bin\tos.bin: src\tos.asm src\boot\bootstage0.asm src\boot\bootstage1.asm src\boot\disk.asm src\boot\print.asm
@@ -23,8 +23,8 @@ bin\BOOTX64.EFI: bin\main.o bin\libgnuefi_data.o
 # copy /b bin\mbr.bin+bin\kernel.bin $@
 # copy /b bin\mbr.bin $@
 
-run: bin\BOOTX64.EFI
-	qemu-system-x86_64 --bios external\OVMF\OVMF-pure -drive file=fat:floppy:rw:bin,format=raw
+run: bin\EFI\BOOT\BOOTX64.EFI
+	qemu-system-x86_64 --bios external\OVMF\OVMF-pure-efi.fd -drive file=fat:floppy:rw:bin,format=raw
 #	bochsdbg -f bin\bochsrc.bxrc -q
 
 
