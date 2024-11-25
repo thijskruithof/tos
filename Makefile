@@ -23,9 +23,9 @@ bin\BOOTX64.EFI: bin\main.o bin\libgnuefi_data.o
 # copy /b bin\mbr.bin+bin\kernel.bin $@
 # copy /b bin\mbr.bin $@
 
-run: bin\tos.bin
-#	qemu-system-i386 -fda $< 
-	bochsdbg -f bin\bochsrc.bxrc -q
+run: bin\BOOTX64.EFI
+	qemu-system-x86_64 --bios external\OVMF\OVMF-pure -drive file=fat:floppy:rw:bin,format=raw
+#	bochsdbg -f bin\bochsrc.bxrc -q
 
 
 clean:

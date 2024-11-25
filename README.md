@@ -8,6 +8,5 @@ Inspired by:
 
 Requirements:
 - Make
-- Nasm
 - GCC
 - Qemu
