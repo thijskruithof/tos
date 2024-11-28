@@ -2,19 +2,22 @@
 # $< = first dependency
 # $^ = all dependencies
 
-GCC := x86_64-w64-mingw32-gcc
+GCC := gcc 
+# x86_64-w64-mingw32-gcc
 
 all: bin\disk\EFI\BOOT\BOOTX64.EFI
 
-bin\main.o: src\main.c 
-	$(GCC) -ffreestanding -Iexternal/gnu-efi/inc -Iexternal/gnu-efi/inc/x86_64 -Iexternal/gnu-efi/inc/protocol -c -o $@ $<
+# -ffreestanding -fshort-wchar -g
 
-bin\libgnuefi_data.o: src\libgnuefi_data.c 
-	$(GCC) -ffreestanding -Iexternal/gnu-efi/inc -Iexternal/gnu-efi/inc/x86_64 -Iexternal/gnu-efi/inc/protocol -c -o $@ $<
+bin/main.o: src/main.c 
+	$(GCC) -ffreestanding -Iexternal/gnu-efi/inc -Iexternal/gnu-efi/inc/x86_64 -Iexternal/gnu-efi/inc/protocol -fshort-wchar -g -c -o $@ $<
 
-bin\disk\EFI\BOOT\BOOTX64.EFI: bin\main.o bin\libgnuefi_data.o 
-	del /S /Q /F bin\disk
-	md bin\disk\EFI\BOOT
+bin/libgnuefi_data.o: src/libgnuefi_data.c 
+	$(GCC) -ffreestanding -Iexternal/gnu-efi/inc -Iexternal/gnu-efi/inc/x86_64 -Iexternal/gnu-efi/inc/protocol -fshort-wchar -g -c -o $@ $<
+
+bin/disk/EFI/BOOT/BOOTX64.EFI: bin/main.o bin/libgnuefi_data.o 
+	rm -r -f bin/disk/
+	mkdir -p bin/disk/EFI/BOOT
 	$(GCC) -nostdlib -Wl,-dll -shared -Wl,--subsystem,10 -e efi_main -o $@ $^
 
 run: bin\disk\EFI\BOOT\BOOTX64.EFI
