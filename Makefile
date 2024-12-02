@@ -15,7 +15,7 @@ buildimg:
 	mformat -i $(IMAGEFILE) -f 1440 ::
 	mmd -i $(IMAGEFILE) ::/EFI
 	mmd -i $(IMAGEFILE) ::/EFI/BOOT
-	mcopy -i $(IMAGEFILE) src/bootloader/main.efi ::/EFI/BOOT
+	mcopy -i $(IMAGEFILE) src/bootloader/main.efi ::/EFI/BOOT/BOOTX64.EFI
 	mcopy -i $(IMAGEFILE) $(BUILDDIR)/kernel.elf ::
 
 run:
