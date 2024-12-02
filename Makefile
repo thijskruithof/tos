@@ -1,6 +1,6 @@
 BUILDDIR := bin
 IMAGEFILE := $(BUILDDIR)/tos.img
-OVMFDIR = ../external/OVMF
+OVMFDIR = external/OVMF
 
 all: buildbootloader buildkernel buildimg
 
