@@ -24,20 +24,15 @@
         {
             "type": "process",
             "label": "Launch Qemu",
-            "command": "qemu-system-x86_64",
+            "command": "explorer.exe",
             "args": [
-                "-drive", 
-                "file=bin/tos.img",
-                "-m 256M",
-                "-cpu qemu64",
-                "-drive if=pflash,format=raw,unit=0,file=\"external/OVMF/OVMF_CODE-pure-efi.fd\",readonly=on",
-                "-drive if=pflash,format=raw,unit=1,file=\"external/OVMF/OVMF_VARS-pure-efi.fd\"",
-                "-net none"
+                "run.bat"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
             },
-            "dependsOn": "Build kernel"
+            "dependsOn": "Build kernel",
+            "problemMatcher": []
         }
     ]
 }

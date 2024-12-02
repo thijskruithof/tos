@@ -23,7 +23,7 @@ run:
 	# -net None => disable ipxe network booting 
 	# -s => start a gdb debugger on port 1234
 	# -S => wait for gdb connection at startup
-	qemu-system-x86_64 -drive file=$(IMAGEFILE) -m 256M -cpu qemu64 -drive if=pflash,format=raw,unit=0,file="$(OVMFDIR)/OVMF_CODE-pure-efi.fd",readonly=on -drive if=pflash,format=raw,unit=1,file="$(OVMFDIR)/OVMF_VARS-pure-efi.fd" -net none -s -S
+	nohup qemu-system-x86_64 -drive file=$(IMAGEFILE) -m 256M -cpu qemu64 -drive if=pflash,format=raw,unit=0,file="$(OVMFDIR)/OVMF_CODE-pure-efi.fd",readonly=on -drive if=pflash,format=raw,unit=1,file="$(OVMFDIR)/OVMF_VARS-pure-efi.fd" -net none -s -S &
 
 clean:
 	rm -f $(IMAGEFILE)
