@@ -40,9 +40,9 @@ BOOLEAN VerifyStatus(EFI_STATUS Status)
 
 
 /** 
-@brief Load a file from disk
+@brief Open a file on disk
 **/
-EFI_STATUS LoadFile(CHAR16* Filename, EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable, EFI_FILE** OutFile)
+EFI_STATUS OpenFile(CHAR16* Filename, EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable, EFI_FILE** OutFile)
 {
 	EFI_STATUS Status;
 
@@ -87,20 +87,35 @@ EFI_STATUS LoadFile(CHAR16* Filename, EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* 
 
 
 /**
-@brief Load an ELF file from disk
+@brief Load our ELF from an opened file into memory and return its entry point
 **/
-EFI_STATUS LoadELFFile(CHAR16* Path, EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable, void** OutKernelEntry)
+EFI_STATUS LoadELFFromFile(EFI_FILE* File, EFI_SYSTEM_TABLE* SystemTable, void** OutEntry)
+{
+    return EFI_SUCCESS;
+}
+
+
+
+/**
+@brief Load an ELF from a file with the given name and return its entry point
+**/
+EFI_STATUS LoadELF(CHAR16* Path, EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable, void** OutKernelEntry)
 {
 	EFI_STATUS Status;
-	EFI_FILE* Kernel;
+	EFI_FILE* KernelFile;
 	
 	// Load the file to memory
-	Status = LoadFile(Path, ImageHandle, SystemTable, &Kernel);
+	Status = OpenFile(Path, ImageHandle, SystemTable, &KernelFile);
 	if (EFI_ERROR(Status))
 		return Status;
 
-	
+    // Get the ELF's 
+    void* KernelEntry = NULL;
+	Status = LoadELFFromFile(KernelFile, SystemTable, &KernelEntry);
+    if (EFI_ERROR(Status))
+        return Status;
 
+    *OutKernelEntry = KernelEntry;
 	return EFI_SUCCESS;
 }
 
@@ -117,7 +132,7 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable)
     EFI_STATUS Status;
     void* KernelEntry = NULL;
 
-    Status = LoadELFFile(L"kernel.elf", ImageHandle, SystemTable, &KernelEntry);
+    Status = LoadELF(L"kernel.elf", ImageHandle, SystemTable, &KernelEntry);
     if (!VerifyStatus(Status))
         return Status;
 
