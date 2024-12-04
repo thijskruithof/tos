@@ -22,17 +22,25 @@
             }
         },
         {
-            "type": "process",
+            "type": "shell",
             "label": "Launch Qemu",
-            "command": "explorer.exe",
-            "args": [
-                "run.bat"
-            ],
+            "isBackground": true,
+            "command": "echo Starting QEMU&make run",
             "options": {
                 "cwd": "${workspaceFolder}"
             },
             "dependsOn": "Build kernel",
-            "problemMatcher": []
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(Starting QEMU)",
+                    "line": 1,
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "^(Starting QEMU)",
+                    "endsPattern": "^(Starting QEMU)"
+                }
+            }
         }
     ]
 }

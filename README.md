@@ -11,6 +11,8 @@ Requirements:
 - Make
 - GCC
 - Qemu
+- Visual Studio Code
+- Visual Studio Code Extension: WSL
 
 ## Compiling
 
@@ -21,6 +23,11 @@ From a shell in this folder just run:
 
 After this you should have file name `tos.img` in your `build` directory.
 
-To run this generated image file in Qemu, just type:
+## Running
 
+From a shell:
 `make run`
+
+From VSCode:
+- For simply running: run the `Launch Qemu` task
+- For debugging: use the Run and Debug (F5) button, using the `Debug Kernel` configuration
