@@ -1,4 +1,8 @@
 {
     "makefile.configureOnOpen": true,
     "debug.onTaskErrors": "debugAnyway",
+    "files.associations": {
+        "lib.h": "c",
+        "efi.h": "c"
+    },
 }
