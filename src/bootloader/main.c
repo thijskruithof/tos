@@ -5,20 +5,24 @@
 
 
 #define VERIFY(status) \
-	if (EFI_ERROR(status)) TerminateOnError(__FUNCTION__ ## " at line " ## __LINE__);
+	if (EFI_ERROR(status)) TerminateOnError(status, "Error status", __FUNCTION__, __LINE__);
 
-#define ASSERT(cond) \
-	if (!(cond)) TerminateOnError("Assert in " ## __FUNCTION__ ## " at line " ## __LINE__);
+#define ASSURE(cond) \
+	if (!(cond)) TerminateOnError(EFI_SUCCESS, #cond, __FUNCTION__, __LINE__);
 
 /**
 @brief Verify the provided status, and if it is an error, wait for a keystroke before returning.
 @return FALSE on error, otherwise TRUE
 **/
-void TerminateOnError(const char* inError)
+void TerminateOnError(EFI_STATUS inStatus, const char* inCond, const char* inErrorFunc, int inErrorLine)
 {
 	EFI_STATUS con_status;
 
-    Print(L"Error while initializing Tos: %a\n\r", inError);
+    Print(L"Error while initializing Tos.\n\r");
+	Print(L"Condition: %a\n\r", inCond);
+	if (EFI_ERROR(inStatus))
+		Print(L"EFI Error: %r\n\r", inStatus);
+	Print(L"Location: %a:%d\n\r", inErrorFunc, inErrorLine);
 
     // Wait for a keystroke before continuing, otherwise your
     // message will flash off the screen before you see it.
@@ -27,14 +31,15 @@ void TerminateOnError(const char* inError)
     // out any keystrokes entered before this point
     con_status = gST->ConIn->Reset(gST->ConIn, FALSE);
     if (EFI_ERROR(con_status))
-        return FALSE;
+		return;
 
-    EFI_INPUT_KEY key;
+	while (TRUE)
+	{
+    	EFI_INPUT_KEY key;
 
-    // Now wait until a key becomes available.
-    while (gST->ConIn->ReadKeyStroke(gST->ConIn, &key) == EFI_NOT_READY);        
-
-    return FALSE;
+    	// Now wait until a key becomes available.
+    	while (gST->ConIn->ReadKeyStroke(gST->ConIn, &key) == EFI_NOT_READY);        
+	}
 }
 
 
@@ -44,27 +49,25 @@ void TerminateOnError(const char* inError)
 **/
 EFI_FILE* OpenFile(CHAR16* inFilename)
 {
-	EFI_STATUS status;
-
 	// Get the Loaded Image protocol
 	EFI_LOADED_IMAGE_PROTOCOL* loaded_image = NULL;
 	VERIFY(gST->BootServices->HandleProtocol(LibImageHandle, &gEfiLoadedImageProtocolGuid, (void**)&loaded_image));
-	ASSERT(loaded_image != NULL);	
+	ASSURE(loaded_image != NULL);	
 
 	// Get its File System protocol
 	EFI_SIMPLE_FILE_SYSTEM_PROTOCOL* filesystem = NULL;
 	VERIFY(gST->BootServices->HandleProtocol(loaded_image->DeviceHandle, &gEfiSimpleFileSystemProtocolGuid, (void**)&filesystem));
-	ASSERT(filesystem != NULL);		
+	ASSURE(filesystem != NULL);		
 
 	// Open our File System volume (in the root directory)
 	EFI_FILE* directory = NULL;
 	VERIFY(filesystem->OpenVolume(filesystem, &directory));
-	ASSERT(directory != NULL);		
+	ASSURE(directory != NULL);		
 
 	// Open the specified file by its inFilename
 	EFI_FILE* file = NULL;
 	VERIFY(directory->Open(directory, &file, inFilename, EFI_FILE_MODE_READ, EFI_FILE_READ_ONLY));
-	ASSERT(file != NULL);
+	ASSURE(file != NULL);
 
 	// Success!
 	return file;
@@ -104,24 +107,24 @@ void* LoadELFFromFile(EFI_FILE* inFile)
 	Elf64_Ehdr hdr;	
 	UINTN hdr_size = sizeof(hdr);
 	VERIFY(inFile->Read(inFile, &hdr_size, &hdr));
-	ASSERT(hdr_size > 0);
+	ASSURE(hdr_size > 0);
 
 	// Check first 4 characters (\177ELF)
-	ASSERT(hdr.e_ident[EI_MAG0] == ELFMAG0);
-	ASSERT(hdr.e_ident[EI_MAG1] == ELFMAG1);
-	ASSERT(hdr.e_ident[EI_MAG2] == ELFMAG2);
-	ASSERT(hdr.e_ident[EI_MAG3] == ELFMAG3);
+	ASSURE(hdr.e_ident[EI_MAG0] == ELFMAG0);
+	ASSURE(hdr.e_ident[EI_MAG1] == ELFMAG1);
+	ASSURE(hdr.e_ident[EI_MAG2] == ELFMAG2);
+	ASSURE(hdr.e_ident[EI_MAG3] == ELFMAG3);
 
 	// 64 bit object?
 	// Executable?
 	// 2's complement, little endian?
 	// 64bit x86?
 	// Currently support elf format version?
-	ASSERT(hdr.e_ident[EI_CLASS] == ELFCLASS64);
-	ASSERT(hdr.e_type == ET_EXEC);
-	ASSERT(hdr.e_ident[EI_DATA] == ELFDATA2LSB);
-	ASSERT(hdr.e_machine == EM_X86_64);
-	ASSERT(hdr.e_version == EV_CURRENT);
+	ASSURE(hdr.e_ident[EI_CLASS] == ELFCLASS64);
+	ASSURE(hdr.e_type == ET_EXEC);
+	ASSURE(hdr.e_ident[EI_DATA] == ELFDATA2LSB);
+	ASSURE(hdr.e_machine == EM_X86_64);
+	ASSURE(hdr.e_version == EV_CURRENT);
 
 	Elf64_Phdr* phdrs;
 	
@@ -175,8 +178,6 @@ void* LoadELFFromFile(EFI_FILE* inFile)
 **/
 void* LoadELF(CHAR16* inPath)
 {
-	EFI_STATUS status;
-	
 	// Load the file to memory
 	EFI_FILE* file = OpenFile(inPath);
 
@@ -194,17 +195,13 @@ EFI_STATUS efi_main(EFI_HANDLE inImageHandle, EFI_SYSTEM_TABLE* inSystemHandle)
     // Init the EFI lib
     InitializeLib(inImageHandle, inSystemHandle);
 
-    EFI_STATUS status;
-
 	// Load our kernel's elf from disk and get its entry point address
-    void* kernel_entry = NULL;
-    status = LoadELF(L"kernel.elf", &kernel_entry);
-    if (!VerifyStatus(status))
-		return status;
-
+    // void* kernel_entry = 
+	LoadELF(L"kernel.elf");
+    
 	// If get here it means we succeeded actually!
 	gST->ConOut->OutputString(gST->ConOut, L"Successfully loaded the kernel! Ignore the next error.\n\r");
-	VerifyStatus(EFI_LOAD_ERROR);
+	ASSURE(FALSE);
 
-    return status;
+    return EFI_SUCCESS;
 }
