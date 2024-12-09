@@ -22,7 +22,7 @@ void TerminateOnError(EFI_STATUS inStatus, const char* inCond, const char* inErr
 	Print(L"Condition: %a\n\r", inCond);
 	if (EFI_ERROR(inStatus))
 		Print(L"EFI Error: %r\n\r", inStatus);
-	Print(L"Location: %a:%d\n\r", inErrorFunc, inErrorLine);
+	Print(L"Location: %a (at line %d)\n\r", inErrorFunc, inErrorLine);
 
     // Wait for a keystroke before continuing, otherwise your
     // message will flash off the screen before you see it.
