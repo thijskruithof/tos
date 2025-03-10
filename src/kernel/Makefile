@@ -6,8 +6,8 @@ LDS = kernel.ld
 CC = gcc
 LD = ld
 
-CFLAGS = -ffreestanding -fshort-wchar -g
-LDFLAGS = -T $(LDS) -static -Bsymbolic -nostdlib
+CFLAGS = -ffreestanding -fshort-wchar -g -mcmodel=large -mno-red-zone -mno-mmx -mno-sse -mno-sse2
+LDFLAGS = -T $(LDS) --static -Bsymbolic -nostdlib
 
 SRCDIR := .
 OBJDIR := ../../obj/kernel

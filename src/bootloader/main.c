@@ -116,7 +116,7 @@ void* LoadELFFromFile(EFI_FILE* inFile)
 	ASSURE(hdr.e_ident[EI_MAG3] == ELFMAG3);
 
 	// 64 bit object?
-	// Executable?
+	// Executable
 	// 2's complement, little endian?
 	// 64bit x86?
 	// Currently support elf format version?
@@ -140,14 +140,17 @@ void* LoadELFFromFile(EFI_FILE* inFile)
 
 	// Read all relevant page headers
 	char* phdr8 = (char*)phdrs;
+	char* phdrs_end8 = phdr8 + phdrs_size;
 
-	while (phdr8 < phdr8 + phdrs_size)
+	while (phdr8 < phdrs_end8)
 	{
 		Elf64_Phdr* phdr = (Elf64_Phdr*)phdr8;
 
 		// Is this a loadable page?	
 		if (phdr->p_type == PT_LOAD)
 		{
+			Print(L"Loading program header: MemSiz: %d, PhysAddr: %llx\n\r", phdr->p_memsz, phdr->p_paddr);
+
 			// Calculate number of 4096 byte pages
 			int num_mem_pages = (phdr->p_memsz + 4096 - 1) / 4096;
 
